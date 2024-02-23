@@ -1,4 +1,6 @@
 const cards = document.querySelectorAll(".memory-card");
+const victoryScreen = document.querySelector(".victory-screen");
+const restartButton = document.getElementById("restartBtn");
 
 let hasFlippedCard = false;
 let lockBoard = false;
@@ -10,17 +12,15 @@ function flipCard() {
   if (lockBoard) return;
   if (this === firstCard) return;
 
-  this.classList.toggle("flip");
+  this.classList.add("flip");
 
   if (!hasFlippedCard) {
     hasFlippedCard = true;
     firstCard = this;
-
     return;
   }
 
   secondCard = this;
-
   checkForMatch();
 }
 
@@ -35,6 +35,11 @@ function disableCards() {
   secondCard.removeEventListener("click", flipCard);
 
   resetBoard();
+
+  // Check for victory
+  if (document.querySelectorAll(".memory-card:not(.flip)").length === 0) {
+    showVictoryScreen();
+  }
 }
 
 function unflipCards() {
@@ -57,7 +62,21 @@ function shuffle() {
   cards.forEach((card) => {
     let randomPosition = Math.floor(Math.random() * 12);
     card.style.order = randomPosition;
+    card.addEventListener("click", flipCard);
   });
 }
 
-cards.forEach((card) => card.addEventListener("click", flipCard));
+function showVictoryScreen() {
+  victoryScreen.classList.remove("hidden");
+}
+
+function restartGame() {
+  victoryScreen.classList.add("hidden");
+  cards.forEach((card) => {
+    card.classList.remove("flip");
+    card.addEventListener("click", flipCard);
+  });
+  shuffle();
+}
+
+restartButton.addEventListener("click", restartGame);
